@@ -1,10 +1,10 @@
 import { useState } from "react";
 import * as XLSX from "xlsx";
-
+import { Table } from "antd";  // นำเข้า Table จาก antd
+// import 'antd/dist/reset.css'; // เรียกใช้ CSS ของ Ant Design
 import './App.css';
 
 function App() {
-
   const [data, setData] = useState([]);
 
   const handleFileUpload = (e) => {
@@ -18,38 +18,29 @@ function App() {
       const parsedData = XLSX.utils.sheet_to_json(sheet);
       setData(parsedData);
     };
-  }
+  };
 
-  console.log(data)
+  // กำหนดคอลัมน์ให้กับตารางใน Ant Design
+  const columns = data.length > 0 ? Object.keys(data[0]).map(key => ({
+    title: key, 
+    dataIndex: key,
+    key: key,
+  })) : [];
 
   return (
     <div className="App">
-
       <input 
         type="file" 
         accept=".xlsx, .xls" 
         onChange={handleFileUpload} 
       />
-
+      
       {data.length > 0 && (
-        <table className="table">
-          <thead>
-            <tr>
-              {Object.keys(data[0]).map((key) => (
-                <th key={key}>{key}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr key={index}>
-                {Object.values(row).map((value, index) => (
-                  <td key={index}>{value}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table 
+          columns={columns} 
+          dataSource={data} 
+          rowKey={(record, index) => index.toString()}  // ใช้ index เพื่อเป็น row key
+        />
       )}
 
       <br /><br />
